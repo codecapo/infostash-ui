@@ -73,7 +73,7 @@ const ChatInterface = () => {
                 onClose={() => setIsHomeDrawerOpen(false)}
                 onOpenContentDrawer={handleContentDrawerOpen}
             />
-            <DrawerComponent
+            <ContentDrawerComponent
                 isOpen={isContentDrawerOpen}
                 onClose={handleContentDrawerClose}
             />
@@ -187,7 +187,7 @@ const HomeDrawerComponent = ({ isOpen, onClose, onOpenContentDrawer }) => {
     );
 };
 
-const DrawerComponent = ({ isOpen, onClose }) => {
+const ContentDrawerComponent = ({ isOpen, onClose }) => {
     const [blocks, setBlocks] = useState([{ type: 'text', content: '' }]);
 
     const addBlock = (index, type = 'text') => {
