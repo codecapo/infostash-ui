@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react';
-import { User, Menu, Send, Plus, Minus, File, Image, Music, Video } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { User, Send, Plus, Minus, File, Image, Music, Video, PanelRightOpen, PanelRightClose } from 'lucide-react';
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -23,21 +23,6 @@ import {
 const ChatInterface = () => {
     const [messages, setMessages] = useState([]);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-    const timerRef = useRef(null);
-
-    useEffect(() => {
-        const handleMouseMove = (e) => {
-            if (e.clientX > window.innerWidth - 20) {
-                if (timerRef.current) clearTimeout(timerRef.current);
-                timerRef.current = setTimeout(() => setIsDrawerOpen(true), 300);
-            } else {
-                if (timerRef.current) clearTimeout(timerRef.current);
-            }
-        };
-
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
-    }, []);
 
     const addMessage = (content, isUser) => {
         setMessages([...messages, { content, isUser }]);
@@ -57,6 +42,14 @@ const ChatInterface = () => {
                     </div>
                 </div>
             </div>
+            <Button
+                variant="ghost"
+                size="icon"
+                className="fixed top-4 right-4 z-50"
+                onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+            >
+                {isDrawerOpen ? <PanelRightClose className="h-6 w-6" /> : <PanelRightOpen className="h-6 w-6" />}
+            </Button>
             <DrawerComponent
                 isOpen={isDrawerOpen}
                 onClose={() => setIsDrawerOpen(false)}
@@ -153,8 +146,10 @@ const DrawerComponent = ({ isOpen, onClose }) => {
     };
 
     const removeBlock = (index) => {
-        const newBlocks = blocks.filter((_, i) => i !== index);
-        setBlocks(newBlocks);
+        if (blocks.length > 1 && index !== 0) {
+            const newBlocks = blocks.filter((_, i) => i !== index);
+            setBlocks(newBlocks);
+        }
     };
 
     return (
@@ -175,6 +170,7 @@ const DrawerComponent = ({ isOpen, onClose }) => {
                             onUpdate={updateBlock}
                             onAddBlock={addBlock}
                             onRemoveBlock={removeBlock}
+                            isFirstBlock={index === 0}
                         />
                     ))}
                 </ScrollArea>
@@ -183,47 +179,38 @@ const DrawerComponent = ({ isOpen, onClose }) => {
     );
 };
 
-const ContentBlock = ({ block, index, onUpdate, onAddBlock, onRemoveBlock }) => {
+const ContentBlock = ({ block, index, onUpdate, onAddBlock, onRemoveBlock, isFirstBlock }) => {
     const inputRef = useRef(null);
 
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (document.activeElement !== inputRef.current) return;
-
-            if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                const prevInput = inputRef.current.parentElement.previousElementSibling?.querySelector('input');
-                if (prevInput) {
-                    prevInput.focus();
-                    const length = prevInput.value.length;
-                    prevInput.setSelectionRange(length, length);
-                }
-            } else if (e.key === 'ArrowDown') {
-                e.preventDefault();
+    const handleKeyDown = (e) => {
+        if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const prevInput = inputRef.current.parentElement.previousElementSibling?.querySelector('input');
+            if (prevInput) {
+                prevInput.focus();
+                const length = prevInput.value.length;
+                prevInput.setSelectionRange(length, length);
+            }
+        } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const nextInput = inputRef.current.parentElement.nextElementSibling?.querySelector('input');
+            if (nextInput) {
+                nextInput.focus();
+                const length = nextInput.value.length;
+                nextInput.setSelectionRange(length, length);
+            }
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            onAddBlock(index, 'text');
+            // Focus on the new block after a short delay to allow for DOM update
+            setTimeout(() => {
                 const nextInput = inputRef.current.parentElement.nextElementSibling?.querySelector('input');
                 if (nextInput) {
                     nextInput.focus();
-                    const length = nextInput.value.length;
-                    nextInput.setSelectionRange(length, length);
                 }
-            } else if (e.key === 'Enter') {
-                e.preventDefault();
-                onAddBlock(index, 'text');
-                // Focus on the new block after a short delay to allow for DOM update
-                setTimeout(() => {
-                    const nextInput = inputRef.current.parentElement.nextElementSibling?.querySelector('input');
-                    if (nextInput) {
-                        nextInput.focus();
-                    }
-                }, 0);
-            }
-        };
-
-        inputRef.current.addEventListener('keydown', handleKeyDown);
-        return () => {
-            inputRef.current?.removeEventListener('keydown', handleKeyDown);
-        };
-    }, [index, onAddBlock]);
+            }, 0);
+        }
+    };
 
     return (
         <div className="group relative mb-4 flex items-center">
@@ -232,18 +219,21 @@ const ContentBlock = ({ block, index, onUpdate, onAddBlock, onRemoveBlock }) => 
                 type="text"
                 value={block.content}
                 onChange={(e) => onUpdate(index, e.target.value)}
+                onKeyDown={handleKeyDown}
                 placeholder={`Type ${block.type} content...`}
                 className="w-full pr-20 bg-transparent border-none focus:outline-none focus:ring-0 text-sm"
             />
             <div className="absolute right-2 flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onRemoveBlock(index)}
-                    className="h-6 w-6"
-                >
-                    <Minus className="h-4 w-4" />
-                </Button>
+                {!isFirstBlock && (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onRemoveBlock(index)}
+                        className="h-6 w-6"
+                    >
+                        <Minus className="h-4 w-4" />
+                    </Button>
+                )}
                 <ContextMenu onSelect={(type) => onAddBlock(index, type)}>
                     <Button
                         variant="ghost"
