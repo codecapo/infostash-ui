@@ -22,7 +22,8 @@ import {
 
 const ChatInterface = () => {
     const [messages, setMessages] = useState([]);
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [isHomeDrawerOpen, setIsHomeDrawerOpen] = useState(false);
+    const [isContentDrawerOpen, setIsContentDrawerOpen] = useState(false);
 
     const addMessage = (content, isUser) => {
         setMessages([...messages, { content, isUser }]);
@@ -46,17 +47,25 @@ const ChatInterface = () => {
                 variant="ghost"
                 size="icon"
                 className="fixed top-4 right-4 z-50"
-                onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+                onClick={() => setIsHomeDrawerOpen(!isHomeDrawerOpen)}
             >
-                {isDrawerOpen ? <PanelRightClose className="h-6 w-6" /> : <PanelRightOpen className="h-6 w-6" />}
+                {isHomeDrawerOpen ? <PanelRightClose className="h-6 w-6" /> : <PanelRightOpen className="h-6 w-6" />}
             </Button>
+            <HomeDrawerComponent
+                isOpen={isHomeDrawerOpen}
+                onClose={() => setIsHomeDrawerOpen(false)}
+                onOpenContentDrawer={() => {
+                    setIsHomeDrawerOpen(false);
+                    setIsContentDrawerOpen(true);
+                }}
+            />
             <DrawerComponent
-                isOpen={isDrawerOpen}
-                onClose={() => setIsDrawerOpen(false)}
+                isOpen={isContentDrawerOpen}
+                onClose={() => setIsContentDrawerOpen(false)}
             />
         </div>
     );
-};
+};;
 
 const MessageList = ({ messages }) => {
     return (
@@ -130,6 +139,27 @@ const InputArea = ({ onSendMessage }) => {
     );
 };
 
+const HomeDrawerComponent = ({ isOpen, onClose, onOpenContentDrawer }) => {
+    return (
+        <Sheet open={isOpen} onOpenChange={onClose}>
+            <SheetContent className="bg-background/80 backdrop-blur-sm border-l border-border">
+                <SheetHeader>
+                    <SheetTitle>Home Drawer</SheetTitle>
+                    <SheetDescription>
+                        Quick access to add content
+                    </SheetDescription>
+                </SheetHeader>
+                <div className="py-4">
+                    <Button onClick={onOpenContentDrawer} className="w-full">
+                        <PanelRightOpen className="mr-2 h-4 w-4" />
+                        Add Content
+                    </Button>
+                </div>
+            </SheetContent>
+        </Sheet>
+    );
+};
+
 const DrawerComponent = ({ isOpen, onClose }) => {
     const [blocks, setBlocks] = useState([{ type: 'text', content: '' }]);
 
@@ -178,6 +208,7 @@ const DrawerComponent = ({ isOpen, onClose }) => {
         </Sheet>
     );
 };
+
 
 const ContentBlock = ({ block, index, onUpdate, onAddBlock, onRemoveBlock, isFirstBlock }) => {
     const inputRef = useRef(null);
