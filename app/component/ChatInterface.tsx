@@ -51,11 +51,13 @@ const ChatInterface = () => {
             <div className="flex-grow flex flex-col">
                 <div className="flex-grow overflow-hidden">
                     <ScrollArea className="h-full p-4">
-                        <MessageList messages={messages} />
+                        <div className="max-w-2xl mx-auto">
+                            <MessageList messages={messages} />
+                        </div>
                     </ScrollArea>
                 </div>
                 <div className="p-4 bg-background flex justify-center">
-                    <div className="w-1/3">
+                    <div className="w-full max-w-2xl">
                         <InputArea onSendMessage={(content) => addMessage(content, true)} />
                     </div>
                 </div>
@@ -80,6 +82,7 @@ const ChatInterface = () => {
         </div>
     );
 };
+
 const MessageList = ({ messages }) => {
     return (
         <div className="space-y-4">
@@ -93,27 +96,23 @@ const MessageList = ({ messages }) => {
 const MessageItem = ({ message }) => {
     const { content, isUser } = message;
     return (
-        <div className="flex items-start space-x-2">
-            {isUser ? (
-                <Avatar>
+        <div className="w-full flex items-start space-x-2">
+            <Avatar className="h-8 w-8 flex-shrink-0">
+                {isUser ? (
                     <AvatarFallback>
-                        <User className="w-6 h-6" />
+                        <User className="h-5 w-5" />
                     </AvatarFallback>
-                </Avatar>
-            ) : (
-                <Avatar>
-                    <AvatarImage src="/bot-avatar.png" alt="AI" />
-                    <AvatarFallback>AI</AvatarFallback>
-                </Avatar>
-            )}
-            <div className="flex-grow">
-                <div
-                    className={`rounded-lg p-3 break-words ${
-                        isUser ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
-                    }`}
-                >
-                    {content}
-                </div>
+                ) : (
+                    <>
+                        <AvatarImage src="/bot-avatar.png" alt="AI" />
+                        <AvatarFallback>AI</AvatarFallback>
+                    </>
+                )}
+            </Avatar>
+            <div className={`flex-grow rounded-lg p-3 break-words ${
+                isUser ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
+            }`}>
+                <div className="break-words">{content}</div>
             </div>
         </div>
     );
