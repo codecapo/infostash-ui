@@ -154,7 +154,7 @@ const DrawerComponent = ({ isOpen, onClose }) => {
 
     return (
         <Sheet open={isOpen} onOpenChange={onClose}>
-            <SheetContent>
+            <SheetContent className="bg-background/80 backdrop-blur-sm border-l border-border">
                 <SheetHeader>
                     <SheetTitle>Session Content</SheetTitle>
                     <SheetDescription>
