@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef } from 'react';
-import { User, Send, Plus, Minus, File, Image, Music, Video, PanelRightOpen, PanelRightClose } from 'lucide-react';
+import { User, Send, Plus, Minus, File, Image, Music, Video, PanelRightOpen, PanelRightClose, FilePlus, FilePenLine, FileArchive, FileSliders } from 'lucide-react';
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -80,7 +80,6 @@ const ChatInterface = () => {
         </div>
     );
 };
-
 const MessageList = ({ messages }) => {
     return (
         <div className="space-y-4">
@@ -154,20 +153,34 @@ const InputArea = ({ onSendMessage }) => {
 };
 
 const HomeDrawerComponent = ({ isOpen, onClose, onOpenContentDrawer }) => {
+    const iconButtons = [
+        { icon: FilePlus, label: "Add", onClick: onOpenContentDrawer },
+        { icon: FilePenLine, label: "Amend", onClick: onOpenContentDrawer },
+        { icon: FileArchive, label: "Archive", onClick: () => console.log("Archive clicked") },
+        { icon: FileSliders, label: "Share", onClick: () => console.log("Share clicked") },
+    ];
+
     return (
         <Sheet open={isOpen} onOpenChange={onClose}>
             <SheetContent className="bg-background/80 backdrop-blur-sm border-l border-border">
                 <SheetHeader>
                     <SheetTitle>Home Drawer</SheetTitle>
                     <SheetDescription>
-                        Quick access to add content
+                        Quick access to file operations
                     </SheetDescription>
                 </SheetHeader>
-                <div className="py-4">
-                    <Button onClick={onOpenContentDrawer} className="w-full">
-                        <PanelRightOpen className="mr-2 h-4 w-4" />
-                        Add Content
-                    </Button>
+                <div className="py-4 grid grid-cols-2 gap-3">
+                    {iconButtons.map((button, index) => (
+                        <Button
+                            key={index}
+                            onClick={button.onClick}
+                            className="flex items-center justify-start h-12 px-3"
+                            variant="outline"
+                        >
+                            <button.icon className="h-5 w-5 mr-2" />
+                            <span className="text-sm">{button.label}</span>
+                        </Button>
+                    ))}
                 </div>
             </SheetContent>
         </Sheet>
