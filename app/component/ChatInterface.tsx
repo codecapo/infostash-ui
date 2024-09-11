@@ -29,6 +29,23 @@ const ChatInterface = () => {
         setMessages([...messages, { content, isUser }]);
     };
 
+    const handleHomeDrawerToggle = () => {
+        setIsHomeDrawerOpen(!isHomeDrawerOpen);
+        if (isContentDrawerOpen) {
+            setIsContentDrawerOpen(false);
+        }
+    };
+
+    const handleContentDrawerOpen = () => {
+        setIsHomeDrawerOpen(false);
+        setIsContentDrawerOpen(true);
+    };
+
+    const handleContentDrawerClose = () => {
+        setIsContentDrawerOpen(false);
+        setIsHomeDrawerOpen(true);
+    };
+
     return (
         <div className="flex h-screen">
             <div className="flex-grow flex flex-col">
@@ -47,25 +64,22 @@ const ChatInterface = () => {
                 variant="ghost"
                 size="icon"
                 className="fixed top-4 right-4 z-50"
-                onClick={() => setIsHomeDrawerOpen(!isHomeDrawerOpen)}
+                onClick={handleHomeDrawerToggle}
             >
-                {isHomeDrawerOpen ? <PanelRightClose className="h-6 w-6" /> : <PanelRightOpen className="h-6 w-6" />}
+                {isHomeDrawerOpen || isContentDrawerOpen ? <PanelRightClose className="h-6 w-6" /> : <PanelRightOpen className="h-6 w-6" />}
             </Button>
             <HomeDrawerComponent
                 isOpen={isHomeDrawerOpen}
                 onClose={() => setIsHomeDrawerOpen(false)}
-                onOpenContentDrawer={() => {
-                    setIsHomeDrawerOpen(false);
-                    setIsContentDrawerOpen(true);
-                }}
+                onOpenContentDrawer={handleContentDrawerOpen}
             />
             <DrawerComponent
                 isOpen={isContentDrawerOpen}
-                onClose={() => setIsContentDrawerOpen(false)}
+                onClose={handleContentDrawerClose}
             />
         </div>
     );
-};;
+};
 
 const MessageList = ({ messages }) => {
     return (
