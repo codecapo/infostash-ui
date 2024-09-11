@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef } from 'react';
-import { User, Send, Plus, Minus, File, Image, Music, Video, PanelRightOpen, PanelRightClose, FilePlus, FilePenLine, FileArchive, FileSliders } from 'lucide-react';
+import { User, MessagesSquare, Plus, Minus, File, Image, Music, Video, PanelRightOpen, PanelRightClose, FilePlus, FilePenLine, FileArchive, FileSliders } from 'lucide-react';
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -96,23 +96,25 @@ const MessageList = ({ messages }) => {
 const MessageItem = ({ message }) => {
     const { content, isUser } = message;
     return (
-        <div className="w-full flex items-start space-x-2">
-            <Avatar className="h-8 w-8 flex-shrink-0">
-                {isUser ? (
-                    <AvatarFallback>
-                        <User className="h-5 w-5" />
-                    </AvatarFallback>
-                ) : (
-                    <>
-                        <AvatarImage src="/bot-avatar.png" alt="AI" />
-                        <AvatarFallback>AI</AvatarFallback>
-                    </>
-                )}
-            </Avatar>
-            <div className={`flex-grow rounded-lg p-3 break-words ${
-                isUser ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
-            }`}>
-                <div className="break-words">{content}</div>
+        <div className={`w-full rounded-lg p-3 ${
+            isUser ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground'
+        }`}>
+            <div className="flex items-center space-x-3">
+                <Avatar className="h-8 w-8 flex-shrink-0">
+                    {isUser ? (
+                        <AvatarFallback>
+                            <User className="h-5 w-5" />
+                        </AvatarFallback>
+                    ) : (
+                        <>
+                            <AvatarImage src="/bot-avatar.png" alt="AI" />
+                            <AvatarFallback>AI</AvatarFallback>
+                        </>
+                    )}
+                </Avatar>
+                <div className="flex-grow">
+                    <div className="break-words">{content}</div>
+                </div>
             </div>
         </div>
     );
@@ -130,22 +132,24 @@ const InputArea = ({ onSendMessage }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex items-center">
+        <form onSubmit={handleSubmit} className="flex items-end">
             <div className="relative flex-grow">
-                <Input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Type your message..."
-                    className="pr-10"
-                />
-                <Button
-                    type="submit"
-                    size="icon"
-                    className="absolute right-0 top-0 h-full rounded-l-none"
-                >
-                    <Send className="h-4 w-4" />
-                </Button>
+                <div className="flex w-full rounded-md border border-input bg-background ring-offset-background">
+                    <Input
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="Type your message..."
+                        className="flex-grow border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[45px]"
+                    />
+                    <Button
+                        type="submit"
+                        size="icon"
+                        className="h-full rounded border-0 bg-transparent hover:bg-accent hover:text-accent-foreground px-1 m-1"
+                    >
+                        <MessagesSquare className="h-12 w-12" />
+
+                    </Button>
+                </div>
             </div>
         </form>
     );
